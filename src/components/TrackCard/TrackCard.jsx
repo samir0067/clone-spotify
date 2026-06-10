@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatTime } from '../../utils/formatTime';
+import fallbackCover from '../../assets/album-cover.png';
 import styles from './TrackCard.module.css';
 
 /**
@@ -10,6 +11,7 @@ import styles from './TrackCard.module.css';
  * @param {object} props.track - The track object.
  * @param {string} props.track.title - Song title.
  * @param {string} props.track.artist - Artist name.
+ * @param {string} [props.track.album] - Album name.
  * @param {number} props.track.duration - Duration in seconds.
  * @param {string} props.track.coverUrl - URL or import path of the cover image.
  * @param {boolean} [props.isPlaying=false] - Whether the song is currently playing.
@@ -18,13 +20,22 @@ import styles from './TrackCard.module.css';
 export function TrackCard({ track, isPlaying = false, onPlayToggle }) {
   if (!track) return null;
 
-  const { title, artist, duration, coverUrl } = track;
+  const { title, artist, album, duration, coverUrl } = track;
 
   const handleKeyPress = (event) => {
     if ((event.key === ' ' || event.key === 'Enter') && onPlayToggle) {
       event.preventDefault();
       onPlayToggle(track);
     }
+  };
+
+  // Si la pochette distante échoue, on bascule une seule fois sur l'image
+  // locale de remplacement pour ne jamais afficher d'image cassée.
+  const handleImageError = (event) => {
+    const img = event.currentTarget;
+    if (img.dataset.fallback) return;
+    img.dataset.fallback = 'true';
+    img.src = fallbackCover;
   };
 
   return (
@@ -37,7 +48,13 @@ export function TrackCard({ track, isPlaying = false, onPlayToggle }) {
       onClick={() => onPlayToggle && onPlayToggle(track)}
     >
       <div className={styles.coverWrapper}>
-        <img src={coverUrl} alt={`Pochette de l'album pour ${title}`} className={styles.cover} />
+        <img
+          src={coverUrl}
+          alt={`Pochette de l'album pour ${title}`}
+          className={styles.cover}
+          onError={handleImageError}
+          loading="lazy"
+        />
         <button
           className={`${styles.playButton} ${isPlaying ? styles.active : ''}`}
           onClick={(e) => {
@@ -60,6 +77,7 @@ export function TrackCard({ track, isPlaying = false, onPlayToggle }) {
       <div className={styles.info}>
         <h3 className={styles.title}>{title}</h3>
         <p className={styles.artist}>{artist}</p>
+        {album && <p className={styles.album}>{album}</p>}
         <span className={styles.duration} aria-label={`Durée : ${formatTime(duration)}`}>
           {formatTime(duration)}
         </span>

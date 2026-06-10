@@ -1,0 +1,46 @@
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--spotify-dark-card-hover);
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Green border on focus, following the Spotify accent */
+.searchBar:focus-within {
+  border-color: var(--spotify-green);
+  background-color: var(--spotify-dark-highlight);
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Hide the native clear button for a cleaner, consistent look */
+.input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}

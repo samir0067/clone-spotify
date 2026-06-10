@@ -1,0 +1,18 @@
+.grid {
+  display: grid;
+  /* Responsive : autant de colonnes que la largeur le permet,
+     moins de colonnes sur petit écran, sans casser la mise en page */
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-lg);
+}
+
+.item {
+  display: flex;
+  justify-content: center;
+}
+
+.empty {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  padding: var(--space-lg) 0;
+}

@@ -104,6 +104,7 @@
     /* Layout Sizes */
     --sidebar-width: 240px;
     --player-height: 90px;
+    --header-height: 64px;
     
     /* Spacing system (relative to rem) */
     --space-xs: 0.25rem;  /* 4px */

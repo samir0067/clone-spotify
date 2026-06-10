@@ -105,6 +105,15 @@
   text-overflow: ellipsis;
 }
 
+.album {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .duration {
   color: var(--color-text-muted);
   font-size: 0.75rem;
