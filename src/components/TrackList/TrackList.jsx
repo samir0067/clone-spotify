@@ -15,7 +15,14 @@ import styles from './TrackList.module.css';
  * @param {number|string} [props.currentTrackId] - Id of the active track (for the playing indicator).
  * @param {boolean} [props.isPlaying=false] - Whether the active track is currently playing.
  */
-export function TrackList({ tracks, onTrackSelect, currentTrackId, isPlaying = false }) {
+export function TrackList({
+  tracks,
+  onTrackSelect,
+  currentTrackId,
+  isPlaying = false,
+  favorites = [],
+  onFavoriteToggle,
+}) {
   if (!tracks || tracks.length === 0) {
     return <p className={styles.empty}>Aucun morceau à afficher.</p>;
   }
@@ -28,9 +35,12 @@ export function TrackList({ tracks, onTrackSelect, currentTrackId, isPlaying = f
             track={track}
             isPlaying={isPlaying && currentTrackId === track.id}
             onPlayToggle={onTrackSelect}
+            isFavorite={favorites.includes(track.id)}
+            onFavoriteToggle={onFavoriteToggle}
           />
         </li>
       ))}
     </ul>
   );
 }
+

@@ -17,10 +17,10 @@ import styles from './TrackCard.module.css';
  * @param {boolean} [props.isPlaying=false] - Whether the song is currently playing.
  * @param {function} [props.onPlayToggle] - Event handler for clicking play/pause.
  */
-export function TrackCard({ track, isPlaying = false, onPlayToggle }) {
+export function TrackCard({ track, isPlaying = false, onPlayToggle, isFavorite = false, onFavoriteToggle }) {
   if (!track) return null;
 
-  const { title, artist, album, duration, coverUrl } = track;
+  const { id, title, artist, album, duration, coverUrl } = track;
 
   const handleKeyPress = (event) => {
     if ((event.key === ' ' || event.key === 'Enter') && onPlayToggle) {
@@ -75,7 +75,28 @@ export function TrackCard({ track, isPlaying = false, onPlayToggle }) {
         </button>
       </div>
       <div className={styles.info}>
-        <h3 className={styles.title}>{title}</h3>
+        <div className={styles.titleRow}>
+          <h3 className={styles.title} title={title}>{title}</h3>
+          <button
+            type="button"
+            className={`${styles.favoriteButton} ${isFavorite ? styles.favorited : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onFavoriteToggle) onFavoriteToggle(id);
+            }}
+            aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          >
+            {isFavorite ? (
+              <svg viewBox="0 0 24 24" className={styles.heartIcon} fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" className={styles.heartIcon} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            )}
+          </button>
+        </div>
         <p className={styles.artist}>{artist}</p>
         {album && <p className={styles.album}>{album}</p>}
         <span className={styles.duration} aria-label={`Durée : ${formatTime(duration)}`}>

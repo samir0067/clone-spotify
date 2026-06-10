@@ -87,6 +87,14 @@
   gap: var(--space-xs);
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
 .title {
   color: var(--color-text-primary);
   font-size: 1rem;
@@ -94,7 +102,36 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
 }
+
+.favoriteButton {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.favoriteButton:hover {
+  color: var(--color-text-primary);
+  transform: scale(1.15);
+}
+
+.favoriteButton.favorited {
+  color: var(--spotify-green);
+}
+
+.heartIcon {
+  width: 16px;
+  height: 16px;
+}
+
 
 .artist {
   color: var(--color-text-secondary);

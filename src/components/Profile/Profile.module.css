@@ -1,0 +1,533 @@
+.profilePage {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Profile Header Section */
+.profileHeader {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-xl);
+  padding: var(--space-xl) 0;
+  margin-bottom: var(--space-xl);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(18, 18, 18, 0) 100%);
+  border-radius: var(--radius-lg);
+  padding-left: var(--space-lg);
+  padding-right: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.avatarContainer {
+  position: relative;
+  width: 192px;
+  height: 192px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profilePfp {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profilePfpFallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--spotify-dark-card-hover) 0%, var(--spotify-dark-highlight) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.avatarOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.avatarContainer:hover .avatarOverlay {
+  opacity: 1;
+}
+
+.editIcon {
+  width: 36px;
+  height: 36px;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 250px;
+}
+
+.profileBadge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.username {
+  font-size: clamp(2.5rem, 5vw, 6rem);
+  font-weight: 900;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+  letter-spacing: -2px;
+  margin-bottom: var(--space-md);
+  word-break: break-word;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.username:hover {
+  opacity: 0.95;
+}
+
+.stats {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.editProfileBtn {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px var(--space-lg);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editProfileBtn:hover {
+  border-color: var(--color-text-primary);
+  transform: scale(1.04);
+}
+
+.editProfileBtn:active {
+  transform: scale(0.98);
+}
+
+/* Favorites Section */
+.favoritesSection {
+  margin-top: var(--space-xl);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-lg);
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-md);
+  background-color: var(--spotify-dark-card);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.emptyIconContainer {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background-color: var(--spotify-dark-card-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+  color: var(--color-text-secondary);
+}
+
+.emptyIcon {
+  width: 32px;
+  height: 32px;
+}
+
+.emptyText {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+  max-width: 400px;
+}
+
+.browseBtn {
+  background-color: var(--color-text-primary);
+  color: var(--spotify-black);
+  border: none;
+  padding: 12px var(--space-xl);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.browseBtn:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.04);
+}
+
+/* Modal Styling */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background-color: var(--spotify-dark-card-hover);
+  width: 100%;
+  max-width: 580px;
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: slideUpModal 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUpModal {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.closeBtn {
+  font-size: 1.75rem;
+  font-weight: 300;
+  color: var(--color-text-secondary);
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: var(--space-xs);
+  transition: color 0.2s ease;
+}
+
+.closeBtn:hover {
+  color: var(--color-text-primary);
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.modalGrid {
+  display: flex;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+/* Modal Left: Avatar editing */
+.avatarEditContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+  width: 180px;
+}
+
+.avatarPreview {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.avatarPreview.dragActive {
+  border-color: var(--spotify-green);
+}
+
+.modalPreviewPfp {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modalPreviewFallback {
+  width: 100%;
+  height: 100%;
+  background-color: var(--spotify-dark-highlight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--color-text-secondary);
+}
+
+.avatarPreviewOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  color: var(--color-text-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  text-align: center;
+  padding: var(--space-sm);
+}
+
+.avatarPreview:hover .avatarPreviewOverlay {
+  opacity: 1;
+}
+
+.cameraIcon {
+  width: 28px;
+  height: 28px;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.uploadLabelBtn {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: opacity 0.2s ease;
+}
+
+.uploadLabelBtn:hover {
+  opacity: 0.8;
+}
+
+.removePfpBtn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ff4444;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  text-decoration: underline;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.removePfpBtn:hover {
+  opacity: 0.8;
+}
+
+/* Modal Right: Details and presets */
+.formFields {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  justify-content: center;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.inputLabel {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: 0.5px;
+}
+
+.textInput {
+  background-color: var(--spotify-dark-highlight);
+  color: var(--color-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.textInput:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Avatar presets */
+.presetsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.presetsGrid {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.presetBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  padding: 0;
+  display: flex;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  background: transparent;
+}
+
+.presetBtn:hover {
+  transform: scale(1.08);
+}
+
+.presetBtn.activePreset {
+  border-color: var(--spotify-green);
+  transform: scale(1.05);
+}
+
+.presetImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Modal Footer */
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: var(--space-md);
+}
+
+.saveBtn {
+  background-color: var(--spotify-green);
+  color: var(--color-text-primary);
+  border: none;
+  padding: 12px var(--space-xl);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saveBtn:hover {
+  background-color: var(--spotify-green-hover);
+  transform: scale(1.04);
+}
+
+.saveBtn:active {
+  transform: scale(0.98);
+}
+
+.cancelBtn {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: none;
+  padding: 12px var(--space-xl);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.cancelBtn:hover {
+  opacity: 0.8;
+}

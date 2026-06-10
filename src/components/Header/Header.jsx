@@ -18,7 +18,14 @@ import styles from './Header.module.css';
  * @param {string} [props.appName='Spotify'] - Application name shown next to the logo.
  * @param {string} [props.userName='Utilisateur'] - User name used for the avatar label.
  */
-export function Header({ children, appName = 'Spotify', userName = 'Utilisateur' }) {
+export function Header({
+  children,
+  appName = 'Spotify',
+  userName = 'Utilisateur',
+  pfpUrl = '',
+  onAvatarClick,
+  onBrandClick,
+}) {
   // Build initials from the user name for the fallback avatar.
   const initials = userName
     .split(' ')
@@ -29,21 +36,32 @@ export function Header({ children, appName = 'Spotify', userName = 'Utilisateur'
 
   return (
     <header className={styles.header}>
-      <div className={styles.brand}>
+      <button
+        type="button"
+        className={styles.brand}
+        onClick={onBrandClick}
+        aria-label="Accueil"
+      >
         <img src={logo} alt="" className={styles.logo} />
         <span className={styles.appName}>{appName}</span>
-      </div>
+      </button>
 
       <div className={styles.searchSlot}>{children}</div>
 
       <button
         type="button"
         className={styles.avatar}
+        onClick={onAvatarClick}
         aria-label={`Compte de ${userName}`}
         title={userName}
       >
-        <span aria-hidden="true">{initials}</span>
+        {pfpUrl ? (
+          <img src={pfpUrl} alt="" className={styles.avatarImage} />
+        ) : (
+          <span aria-hidden="true">{initials}</span>
+        )}
       </button>
     </header>
   );
 }
+
