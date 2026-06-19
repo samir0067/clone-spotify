@@ -5,17 +5,26 @@ import styles from './TrackList.module.css';
 /**
  * TrackList component: displays a responsive grid of TrackCard items.
  *
- * The list of tracks is received via props (data stays local to the project).
- * Clicking a card lifts the selected track up to the parent through
- * `onTrackSelect` — filtering / playback logic lives in the parent.
- *
  * @param {object} props - Component props.
  * @param {Array<object>} props.tracks - Tracks to render.
  * @param {function} [props.onTrackSelect] - Called with the clicked track object.
- * @param {number|string} [props.currentTrackId] - Id of the active track (for the playing indicator).
+ * @param {number|string} [props.currentTrackId] - Id of the active track.
  * @param {boolean} [props.isPlaying=false] - Whether the active track is currently playing.
+ * @param {Array<number>} [props.likedTrackIds=[]] - Array of liked track IDs.
+ * @param {function} [props.onLikeToggle] - Called when a track is liked/unliked.
+ * @param {Array<object>} [props.playlists=[]] - List of custom playlists.
+ * @param {function} [props.onAddToPlaylist] - Called when a track is added to a playlist.
  */
-export function TrackList({ tracks, onTrackSelect, currentTrackId, isPlaying = false }) {
+export function TrackList({
+  tracks,
+  onTrackSelect,
+  currentTrackId,
+  isPlaying = false,
+  likedTrackIds = [],
+  onLikeToggle,
+  playlists = [],
+  onAddToPlaylist,
+}) {
   if (!tracks || tracks.length === 0) {
     return <p className={styles.empty}>Aucun morceau à afficher.</p>;
   }
@@ -28,9 +37,14 @@ export function TrackList({ tracks, onTrackSelect, currentTrackId, isPlaying = f
             track={track}
             isPlaying={isPlaying && currentTrackId === track.id}
             onPlayToggle={onTrackSelect}
+            isLiked={likedTrackIds.includes(track.id)}
+            onLikeToggle={onLikeToggle}
+            playlists={playlists}
+            onAddToPlaylist={onAddToPlaylist}
           />
         </li>
       ))}
     </ul>
   );
 }
+

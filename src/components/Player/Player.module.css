@@ -319,3 +319,114 @@
 .volumeSlider:hover:not(.disabledSlider) .volumeSliderProgress {
   background-color: var(--spotify-green);
 }
+
+/* Cover visualizer overlay */
+.coverContainer {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.playerEqOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+.playerEq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 18px;
+}
+
+.playerEqBar {
+  width: 2px;
+  height: 100%;
+  background-color: var(--spotify-green);
+  border-radius: 1px;
+  animation: equalizeMini 0.8s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+
+.playerEqBar:nth-child(1) { animation-duration: 0.6s; animation-delay: -0.1s; }
+.playerEqBar:nth-child(2) { animation-duration: 0.8s; animation-delay: -0.4s; }
+.playerEqBar:nth-child(3) { animation-duration: 0.5s; animation-delay: -0.2s; }
+
+@keyframes equalizeMini {
+  0% { transform: scaleY(0.2); }
+  100% { transform: scaleY(1); }
+}
+
+/* Heart like button styling */
+.likeBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: var(--radius-full);
+  margin-left: var(--space-xs);
+}
+
+.likeBtn:hover {
+  color: var(--color-text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: scale(1.08);
+}
+
+.likeBtn.liked {
+  color: var(--spotify-green);
+}
+
+.heartIcon,
+.heartIconOutline {
+  width: 16px;
+  height: 16px;
+}
+
+/* Lyrics button styling */
+.lyricsBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: var(--radius-full);
+}
+
+.lyricsBtn:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: scale(1.05);
+}
+
+.lyricsBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lyricsActive {
+  color: var(--spotify-green) !important;
+}
+
+.lyricsIcon {
+  width: 18px;
+  height: 18px;
+}
+

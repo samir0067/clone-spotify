@@ -18,7 +18,7 @@ import styles from './Header.module.css';
  * @param {string} [props.appName='Spotify'] - Application name shown next to the logo.
  * @param {string} [props.userName='Utilisateur'] - User name used for the avatar label.
  */
-export function Header({ children, appName = 'Spotify', userName = 'Utilisateur' }) {
+export function Header({ children, appName = 'Spotify', userName = 'Utilisateur', className }) {
   // Build initials from the user name for the fallback avatar.
   const initials = userName
     .split(' ')
@@ -28,7 +28,7 @@ export function Header({ children, appName = 'Spotify', userName = 'Utilisateur'
     .toUpperCase();
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${className || ''}`}>
       <div className={styles.brand}>
         <img src={logo} alt="" className={styles.logo} />
         <span className={styles.appName}>{appName}</span>
@@ -47,3 +47,4 @@ export function Header({ children, appName = 'Spotify', userName = 'Utilisateur'
     </header>
   );
 }
+

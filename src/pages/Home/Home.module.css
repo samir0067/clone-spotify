@@ -1,18 +1,33 @@
 .container {
   min-height: 100vh;
   display: flex;
+  background-color: var(--spotify-black);
+}
+
+.mainLayout {
+  flex: 1;
+  display: flex;
   flex-direction: column;
-  /* Offset for the fixed Header at the top and the player bar at the bottom */
+  margin-left: var(--sidebar-width, 240px);
   padding-top: var(--header-height, 64px);
-  padding-bottom: calc(var(--player-height) + var(--space-lg));
+  padding-bottom: calc(var(--player-height, 90px) + var(--space-lg));
+  min-width: 0;
+  transition: margin-right 0.3s ease;
+}
+
+/* Adjust layout when lyrics are open */
+.mainLayout.withLyrics {
+  margin-right: 350px;
+}
+
+.headerWithLyrics {
+  width: calc(100% - var(--sidebar-width, 240px) - 350px) !important;
 }
 
 .mainContent {
   flex: 1;
-  padding: var(--space-lg);
-  max-width: 1200px;
+  padding: var(--space-lg) var(--space-xl);
   width: 100%;
-  margin: 0 auto;
 }
 
 .section {
@@ -31,7 +46,40 @@
 .sectionSubtitle {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+/* Genre Pills list styling */
+.genrePills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
   margin-bottom: var(--space-lg);
 }
 
+.genrePill {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 6px var(--space-md);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  user-select: none;
+}
 
+.genrePill:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.02);
+}
+
+.genrePill:active {
+  transform: scale(0.98);
+}
+
+.activePill {
+  background-color: var(--color-text-primary) !important;
+  color: var(--spotify-black) !important;
+}

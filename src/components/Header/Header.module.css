@@ -1,17 +1,18 @@
 .header {
   position: fixed;
   top: 0;
-  left: 0;
-  width: 100%;
+  left: var(--sidebar-width, 240px);
+  width: calc(100% - var(--sidebar-width, 240px));
   height: var(--header-height, 64px);
   display: flex;
   align-items: center;
   gap: var(--space-lg);
   padding: var(--space-sm) var(--space-lg);
   background-color: var(--spotify-black);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: var(--shadow-sm);
-  z-index: 200;
+  z-index: 75;
+  transition: width 0.3s ease;
 }
 
 .brand {
@@ -20,6 +21,13 @@
   gap: var(--space-sm);
   flex-shrink: 0;
 }
+
+@media (min-width: 768px) {
+  .brand {
+    display: none;
+  }
+}
+
 
 .logo {
   width: 40px;

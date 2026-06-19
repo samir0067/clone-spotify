@@ -85,8 +85,87 @@ const AUDIO_URLS = [
  * Liste finale des morceaux, avec une pochette unique par morceau.
  * Le seed dérivé de l'id rend chaque image déterministe et différente.
  */
+const CUSTOM_LYRICS = {
+  1: [
+    { time: 0, text: "🎵 (Introduction de Golden Hour)" },
+    { time: 6, text: "It's like a golden hour in the afternoon..." },
+    { time: 15, text: "Everything is shining, color is in bloom..." },
+    { time: 24, text: "You and me together, dancing in the street..." },
+    { time: 32, text: "Underneath the shadows, moving to the beat..." },
+    { time: 41, text: "Oh, it's a golden hour, golden hour..." },
+    { time: 50, text: "🎵 (Solo de Synthétiseur)" },
+    { time: 70, text: "Nothing else matters when I'm looking at you..." },
+    { time: 78, text: "The sky is so bright and the feelings are true..." },
+    { time: 86, text: "We catch the sunlight in the palm of our hand..." },
+    { time: 94, text: "Making memories that will never end..." },
+    { time: 102, text: "Oh, it's a golden hour, golden hour..." },
+    { time: 115, text: "🎵 (Outro - Douces vibrations)" }
+  ],
+  2: [
+    { time: 0, text: "🎵 (Rythme doux - Paper Hearts)" },
+    { time: 8, text: "Remember the days we drew paper hearts..." },
+    { time: 18, text: "Never thought that we would drift apart..." },
+    { time: 28, text: "Now they're scattered in the autumn wind..." },
+    { time: 38, text: "Wondering where it all begins..." },
+    { time: 48, text: "Paper hearts on the bedroom floor..." },
+    { time: 58, text: "I don't think I can love you more..." },
+    { time: 68, text: "But the ink is fading from the page..." },
+    { time: 78, text: "We are actors on a silent stage..." },
+    { time: 88, text: "🎵 (Solo Guitare acoustique)" }
+  ],
+  3: [
+    { time: 0, text: "🎵 (Neon intro - Electric Smile)" },
+    { time: 10, text: "She's got an electric smile, lights up the dark..." },
+    { time: 20, text: "Every time she walks by, she leaves a spark..." },
+    { time: 30, text: "We run through the city of neon lights..." },
+    { time: 40, text: "Living our lives in these summer nights..." },
+    { time: 50, text: "Electric smile, oh it drives me wild..." },
+    { time: 60, text: "🎵 (Beat de batterie entraînant)" }
+  ]
+};
+
+function generateMockLyrics(track) {
+  const duration = track.duration;
+  const lyrics = [];
+  const lines = [
+    `🎵 (Intro Instrumentale - ${track.title})`,
+    "Bienvenue sur ce clone de Spotify Premium !",
+    "Une expérience audio moderne, fluide et interactive.",
+    `Vous écoutez actuellement "${track.title}" par ${track.artist}.`,
+    `Ce morceau fait partie de l'album "${track.album}".`,
+    "Les paroles défilent automatiquement en temps réel.",
+    "C'est magique, n'est-ce pas ?",
+    "Vous pouvez cliquer sur n'importe quelle ligne de paroles...",
+    "Pour naviguer instantanément à cet endroit dans le morceau !",
+    "N'hésitez pas à aimer ce morceau en cliquant sur le cœur.",
+    "Ou à l'ajouter à vos playlists personnalisées.",
+    "Profitez de cette incroyable ambiance musicale !",
+    "Développement moderne avec React 18 et CSS Modules.",
+    "L'égaliseur de fréquences est actif à l'écran.",
+    `Merci d'écouter "${track.title}" de l'artiste ${track.artist} !`,
+    "🎵 (Outro Instrumentale - Fin du titre)"
+  ];
+  
+  const interval = duration / (lines.length + 1);
+  for (let i = 0; i < lines.length; i++) {
+    lyrics.push({
+      time: Math.round((i + 1) * interval),
+      text: lines[i]
+    });
+  }
+  
+  lyrics.unshift({ time: 0, text: `🎵 ${track.title} - ${track.artist}` });
+  return lyrics;
+}
+
+/**
+ * Liste finale des morceaux, avec une pochette unique par morceau.
+ * Le seed dérivé de l'id rend chaque image déterministe et différente.
+ */
 export const TRACKS = RAW_TRACKS.map((track) => ({
   ...track,
   coverUrl: `https://picsum.photos/seed/spotify-${track.id}/300/300`,
   audioUrl: AUDIO_URLS[(track.id - 1) % AUDIO_URLS.length],
+  lyrics: CUSTOM_LYRICS[track.id] || generateMockLyrics(track)
 }));
+
