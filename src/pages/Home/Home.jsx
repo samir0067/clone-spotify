@@ -1,36 +1,36 @@
 import React, { useState } from 'react';
 import { usePlayer } from '../../hooks/usePlayer';
+import { useTracks } from '../../hooks/useTracks';
 import { Header } from '../../components/Header/Header';
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { TrackList } from '../../components/TrackList/TrackList';
 import { Player } from '../../components/Player/Player';
-import { TRACKS } from '../../data/tracks';
 import styles from './Home.module.css';
 
 /**
  * Home : la page principale du clone.
  *
- * État de départ du cours :
- *   - Les morceaux viennent des DONNÉES EN DUR (import { TRACKS }).
- *   - /tracks.json existe déjà dans /public mais n'est PAS encore branché.
- *     C'est l'objet de la Démo 2 : remplacer cet import par un fetch via un hook.
+ * Les morceaux viennent d'une « API » : on les charge avec le hook useTracks,
+ * qui fait un fetch sur /tracks.json et gère les 3 états (chargement / succès /
+ * erreur). Plus aucune donnée en dur ici.
  */
 export function Home() {
-  // Lecteur (morceau courant + play/pause), géré par notre hook.
+  // Lecteur (morceau courant + play/pause).
   const { currentTrack, isPlaying, select, toggle } = usePlayer();
+
+  // Données chargées depuis /tracks.json + les 3 états.
+  const { tracks, loading, error, refetch } = useTracks();
 
   // Recherche : on garde la saisie dans un state, puis on filtre la liste.
   const [query, setQuery] = useState('');
-
-  // Filtre sur le titre OU l'artiste, insensible à la casse.
   const normalizedQuery = query.trim().toLowerCase();
   const filteredTracks = normalizedQuery
-    ? TRACKS.filter(
+    ? tracks.filter(
         (track) =>
           track.title.toLowerCase().includes(normalizedQuery) ||
           track.artist.toLowerCase().includes(normalizedQuery)
       )
-    : TRACKS;
+    : tracks;
 
   return (
     <div className={styles.container}>
@@ -41,17 +41,46 @@ export function Home() {
       <main className={styles.mainContent}>
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Titres populaires</h2>
-          <p className={styles.sectionSubtitle}>
-            {filteredTracks.length} morceau{filteredTracks.length > 1 ? 'x' : ''} affiché
-            {filteredTracks.length > 1 ? 's' : ''}.
-          </p>
 
-          <TrackList
-            tracks={filteredTracks}
-            onTrackSelect={select}
-            currentTrackId={currentTrack?.id}
-            isPlaying={isPlaying}
-          />
+          {/* État 1 : ça charge → squelettes animés */}
+          {loading && (
+            <div className={styles.skeletonGrid} aria-label="Chargement des morceaux">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className={styles.skeletonCard}>
+                  <div className={styles.skeletonCover} />
+                  <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
+                  <div className={`${styles.skeletonLine} ${styles.skeletonArtist}`} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* État 3 : ça a raté → message clair (jamais d'écran blanc) */}
+          {error && (
+            <div className={styles.errorContainer} role="alert">
+              <strong className={styles.errorTitle}>Impossible de charger les morceaux</strong>
+              <p className={styles.errorMessage}>{error}</p>
+              <button className={styles.retryButton} onClick={refetch}>
+                Réessayer
+              </button>
+            </div>
+          )}
+
+          {/* État 2 : ça marche → on affiche la liste */}
+          {!loading && !error && (
+            <>
+              <p className={styles.sectionSubtitle}>
+                {filteredTracks.length} morceau{filteredTracks.length > 1 ? 'x' : ''} affiché
+                {filteredTracks.length > 1 ? 's' : ''}.
+              </p>
+              <TrackList
+                tracks={filteredTracks}
+                onTrackSelect={select}
+                currentTrackId={currentTrack?.id}
+                isPlaying={isPlaying}
+              />
+            </>
+          )}
         </section>
       </main>
 
