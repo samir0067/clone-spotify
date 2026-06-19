@@ -88,14 +88,14 @@
 
 @layer theme {
   :root {
-    /* Spotify Design Tokens - Colors */
-    --spotify-green: #1db954;
-    --spotify-green-hover: #1ed760;
-    --spotify-black: #191414;
-    --spotify-dark-base: #121212;
-    --spotify-dark-highlight: #1a1a1a;
-    --spotify-dark-card: #181818;
-    --spotify-dark-card-hover: #282828;
+    /* Spotify Design Tokens - Colors (Re-themed to a sober dark/orange mix) */
+    --spotify-green: #e65c00;
+    --spotify-green-hover: #ff7417;
+    --spotify-black: #0d0c0b;
+    --spotify-dark-base: #121110;
+    --spotify-dark-highlight: #1c1a18;
+    --spotify-dark-card: #181615;
+    --spotify-dark-card-hover: #262321;
     
     --color-text-primary: #ffffff;
     --color-text-secondary: #b3b3b3;
