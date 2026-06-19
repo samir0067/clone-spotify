@@ -1,26 +1,22 @@
 import React from 'react';
-import { formatTime } from '../../utils/formatTime';
+import { formatDuration } from '../../utils/formatDuration';
 import fallbackCover from '../../assets/album-cover.png';
 import styles from './TrackCard.module.css';
 
 /**
- * TrackCard component showing a single song's details.
- * Serves as the convention template for all components.
+ * TrackCard : la carte d'UN morceau (pochette + titre + artiste + durée).
+ * Sert de gabarit de référence pour les conventions du projet
+ * (1 composant = 1 responsabilité).
  *
- * @param {object} props - Component props.
- * @param {object} props.track - The track object.
- * @param {string} props.track.title - Song title.
- * @param {string} props.track.artist - Artist name.
- * @param {string} [props.track.album] - Album name.
- * @param {number} props.track.duration - Duration in seconds.
- * @param {string} props.track.coverUrl - URL or import path of the cover image.
- * @param {boolean} [props.isPlaying=false] - Whether the song is currently playing.
- * @param {function} [props.onPlayToggle] - Event handler for clicking play/pause.
+ * @param {object} props
+ * @param {object} props.track - Le morceau { title, artist, album, duration, cover }.
+ * @param {boolean} [props.isPlaying=false] - Vrai si CE morceau est en lecture.
+ * @param {function} [props.onPlayToggle] - Appelé avec le morceau au clic.
  */
 export function TrackCard({ track, isPlaying = false, onPlayToggle }) {
   if (!track) return null;
 
-  const { title, artist, album, duration, coverUrl } = track;
+  const { title, artist, album, duration, cover } = track;
 
   const handleKeyPress = (event) => {
     if ((event.key === ' ' || event.key === 'Enter') && onPlayToggle) {
@@ -29,8 +25,8 @@ export function TrackCard({ track, isPlaying = false, onPlayToggle }) {
     }
   };
 
-  // Si la pochette distante échoue, on bascule une seule fois sur l'image
-  // locale de remplacement pour ne jamais afficher d'image cassée.
+  // Si la pochette ne charge pas, on bascule une seule fois sur l'image
+  // locale de remplacement pour ne jamais afficher de case cassée.
   const handleImageError = (event) => {
     const img = event.currentTarget;
     if (img.dataset.fallback) return;
@@ -49,7 +45,7 @@ export function TrackCard({ track, isPlaying = false, onPlayToggle }) {
     >
       <div className={styles.coverWrapper}>
         <img
-          src={coverUrl}
+          src={cover}
           alt={`Pochette de l'album pour ${title}`}
           className={styles.cover}
           onError={handleImageError}
@@ -78,8 +74,8 @@ export function TrackCard({ track, isPlaying = false, onPlayToggle }) {
         <h3 className={styles.title}>{title}</h3>
         <p className={styles.artist}>{artist}</p>
         {album && <p className={styles.album}>{album}</p>}
-        <span className={styles.duration} aria-label={`Durée : ${formatTime(duration)}`}>
-          {formatTime(duration)}
+        <span className={styles.duration} aria-label={`Durée : ${formatDuration(duration)}`}>
+          {formatDuration(duration)}
         </span>
       </div>
     </div>
