@@ -4,11 +4,39 @@ import { Header } from '../../components/Header/Header';
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { TrackList } from '../../components/TrackList/TrackList';
 import { Player } from '../../components/Player/Player';
+import { ProfileModal } from '../../components/ProfileModal/ProfileModal';
 import { TRACKS } from '../../data/tracks';
 import styles from './Home.module.css';
 
+const DEFAULT_USER = {
+  name: 'Utilisateur',
+  avatarColor: 'linear-gradient(135deg, #1db954 0%, #0d5c29 100%)',
+  avatarEmoji: '🎵',
+  subscription: 'Free',
+  favoriteGenre: 'Pop',
+};
+
 export function Home() {
   const nextTrackRef = React.useRef(null);
+
+  const [user, setUser] = React.useState(() => {
+    try {
+      const stored = localStorage.getItem('spotify_clone_user');
+      return stored ? JSON.parse(stored) : DEFAULT_USER;
+    } catch {
+      return DEFAULT_USER;
+    }
+  });
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false);
+
+  const handleSaveProfile = (updatedUser) => {
+    setUser(updatedUser);
+    try {
+      localStorage.setItem('spotify_clone_user', JSON.stringify(updatedUser));
+    } catch {
+      // ignore
+    }
+  };
 
   const {
     isPlaying,
@@ -75,7 +103,7 @@ export function Home() {
 
   return (
     <div className={styles.container}>
-      <Header>
+      <Header user={user} onAvatarClick={() => setIsProfileOpen(true)}>
         <SearchBar onSearch={handleSearch} />
       </Header>
 
@@ -110,6 +138,13 @@ export function Home() {
         onSeek={seek}
         onVolumeChange={setVolume}
         onMuteToggle={toggleMute}
+      />
+
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        user={user}
+        onSave={handleSaveProfile}
       />
     </div>
   );
