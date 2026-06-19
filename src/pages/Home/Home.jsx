@@ -7,7 +7,7 @@ import { Player } from '../../components/Player/Player';
 import { Sidebar } from '../../components/Sidebar/Sidebar';
 import { LyricsPanel } from '../../components/LyricsPanel/LyricsPanel';
 import { PlaylistView } from '../../components/PlaylistView/PlaylistView';
-import { TRACKS } from '../../data/tracks';
+import { TRACKS, generateMockLyrics } from '../../data/tracks';
 import styles from './Home.module.css';
 
 const GENRES = ['Tous', 'Pop', 'Rap', 'Rock', 'Électro', 'Jazz'];
@@ -20,6 +20,10 @@ export function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeGenre, setActiveGenre] = useState('Tous');
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
+
+  // API Fetch states
+  const [apiTracks, setApiTracks] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Playback Queue
   const [playbackQueue, setPlaybackQueue] = useState(TRACKS);
@@ -44,6 +48,56 @@ export function Home() {
   useEffect(() => {
     localStorage.setItem('spotify-clone-playlists', JSON.stringify(playlists));
   }, [playlists]);
+
+  // --- API Fetch Function ---
+  const fetchTracks = async (query) => {
+    setIsLoading(true);
+    try {
+      const searchTerm = query.trim() === '' ? 'top hits' : query;
+      const response = await fetch(
+        `https://itunes.apple.com/search?term=${encodeURIComponent(searchTerm)}&entity=song&limit=30`
+      );
+      if (!response.ok) {
+        throw new Error('La requête réseau iTunes a échoué');
+      }
+      const data = await response.json();
+
+      const formatted = data.results.map((item) => {
+        const trackObj = {
+          id: item.trackId,
+          title: item.trackName || 'Titre inconnu',
+          artist: item.artistName || 'Artiste inconnu',
+          album: item.collectionName || 'Album inconnu',
+          genre: item.primaryGenreName || 'Variété',
+          duration: Math.round((item.trackTimeMillis || 180000) / 1000),
+          coverUrl: item.artworkUrl100
+            ? item.artworkUrl100.replace('100x100', '400x400')
+            : 'https://picsum.photos/seed/spotify-fallback/300/300',
+          audioUrl: item.previewUrl,
+        };
+        // Attach lyrics dynamically
+        trackObj.lyrics = generateMockLyrics(trackObj);
+        return trackObj;
+      });
+
+      setApiTracks(formatted);
+    } catch (error) {
+      console.warn('Erreur iTunes API (offline fallback) :', error);
+      // Fallback to local mock tracks
+      setApiTracks(TRACKS);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --- Debounced Search Query Effect ---
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      fetchTracks(searchQuery);
+    }, 450); // 450ms debounce delay to avoid over-fetching
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
 
   // --- Audio Hook ---
   const {
@@ -70,8 +124,14 @@ export function Home() {
 
   // --- Computed Memos ---
   const likedTracks = useMemo(() => {
-    return TRACKS.filter((track) => likedTrackIds.includes(track.id));
-  }, [likedTrackIds]);
+    // Liked tracks could be from iTunes or local fallback. 
+    // We match likedTrackIds against both local TRACKS and dynamic apiTracks.
+    const allKnownTracks = [...TRACKS, ...apiTracks];
+    const uniqueKnownTracksMap = new Map(allKnownTracks.map((t) => [t.id, t]));
+    return likedTrackIds
+      .map((id) => uniqueKnownTracksMap.get(id))
+      .filter((track) => !!track);
+  }, [likedTrackIds, apiTracks]);
 
   const activePlaylist = useMemo(() => {
     if (activeView.startsWith('playlist-')) {
@@ -81,24 +141,24 @@ export function Home() {
     return null;
   }, [activeView, playlists]);
 
-  // Real-time Home filtering (Search & Genres)
+  // Filter dynamic iTunes results by genre
   const filteredTracks = useMemo(() => {
-    return TRACKS.filter((track) => {
-      if (activeGenre !== 'Tous' && track.genre !== activeGenre) {
-        return false;
-      }
-      if (searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase();
-        return (
-          track.title.toLowerCase().includes(query) ||
-          track.artist.toLowerCase().includes(query) ||
-          track.album.toLowerCase().includes(query) ||
-          track.genre.toLowerCase().includes(query)
-        );
+    return apiTracks.filter((track) => {
+      if (activeGenre !== 'Tous') {
+        const queryGenre = activeGenre.toLowerCase();
+        // Since iTunes returns diverse English genre names, we check partial match
+        // Or if searching in French genres, check mapping. Below handles partial match.
+        const trackGenre = (track.genre || '').toLowerCase();
+        if (queryGenre === 'électro' && (trackGenre.includes('electro') || trackGenre.includes('dance') || trackGenre.includes('house'))) return true;
+        if (queryGenre === 'rap' && (trackGenre.includes('rap') || trackGenre.includes('hip hop') || trackGenre.includes('hip-hop'))) return true;
+        if (queryGenre === 'pop' && trackGenre.includes('pop')) return true;
+        if (queryGenre === 'rock' && trackGenre.includes('rock')) return true;
+        if (queryGenre === 'jazz' && trackGenre.includes('jazz')) return true;
+        return trackGenre.includes(queryGenre);
       }
       return true;
     });
-  }, [searchQuery, activeGenre]);
+  }, [apiTracks, activeGenre]);
 
   // --- Handlers ---
   const handleSearch = (value) => {
@@ -228,7 +288,7 @@ export function Home() {
               
               {!searchQuery && (
                 <p className={styles.sectionSubtitle}>
-                  {TRACKS.length} morceaux répartis sur plusieurs genres et artistes.
+                  Contenu récupéré en direct d&apos;iTunes. Recherchez vos artistes favoris !
                 </p>
               )}
 
@@ -247,16 +307,24 @@ export function Home() {
                 ))}
               </div>
 
-              <TrackList
-                tracks={filteredTracks}
-                onTrackSelect={(track) => handleTrackSelect(track, filteredTracks)}
-                currentTrackId={currentTrack?.id}
-                isPlaying={isPlaying}
-                likedTrackIds={likedTrackIds}
-                onLikeToggle={handleLikeToggle}
-                playlists={playlists}
-                onAddToPlaylist={handleAddToPlaylist}
-              />
+              {/* Loader Spinner or Tracks List */}
+              {isLoading ? (
+                <div className={styles.loaderContainer}>
+                  <div className={styles.spotifyLoader} />
+                  <p className={styles.loaderText}>Recherche musicale en cours...</p>
+                </div>
+              ) : (
+                <TrackList
+                  tracks={filteredTracks}
+                  onTrackSelect={(track) => handleTrackSelect(track, filteredTracks)}
+                  currentTrackId={currentTrack?.id}
+                  isPlaying={isPlaying}
+                  likedTrackIds={likedTrackIds}
+                  onLikeToggle={handleLikeToggle}
+                  playlists={playlists}
+                  onAddToPlaylist={handleAddToPlaylist}
+                />
+              )}
             </section>
           )}
 
@@ -323,4 +391,5 @@ export function Home() {
     </div>
   );
 }
+
 

@@ -124,7 +124,7 @@ const CUSTOM_LYRICS = {
   ]
 };
 
-function generateMockLyrics(track) {
+export function generateMockLyrics(track) {
   const duration = track.duration;
   const lyrics = [];
   const lines = [
