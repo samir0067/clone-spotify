@@ -32,17 +32,25 @@ export function Home() {
     },
   });
 
-  // Le filtrage sera branché plus tard ; pour l'instant on remonte la saisie.
+  const [searchQuery, setSearchQuery] = React.useState('');
+
   const handleSearch = (value) => {
-    // eslint-disable-next-line no-console -- log temporaire de démonstration
-    console.log('Recherche :', value);
+    setSearchQuery(value);
   };
 
-  // Clic sur une carte : on remonte le morceau sélectionné (affiché en console)
-  // et on déclenche la lecture via le hook audio existant.
+  const filteredTracks = React.useMemo(() => {
+    if (!searchQuery.trim()) return TRACKS;
+    const normalizedQuery = searchQuery.toLowerCase().trim();
+    return TRACKS.filter(
+      (track) =>
+        track.title.toLowerCase().includes(normalizedQuery) ||
+        track.artist.toLowerCase().includes(normalizedQuery) ||
+        track.album.toLowerCase().includes(normalizedQuery)
+    );
+  }, [searchQuery]);
+
+  // Clic sur une carte : on déclenche la lecture via le hook audio existant.
   const handleTrackSelect = (track) => {
-    // eslint-disable-next-line no-console -- log temporaire de démonstration
-    console.log('Morceau sélectionné :', track);
     if (currentTrack && currentTrack.id === track.id) {
       toggle();
     } else {
@@ -50,22 +58,24 @@ export function Home() {
     }
   };
 
-  // Navigue vers le morceau suivant dans le catalogue (boucle au début si à la fin)
+  // Navigue vers le morceau suivant (boucle au début si à la fin) dans le contexte filtré ou complet
   const handleNextTrack = () => {
     if (!currentTrack) return;
-    const currentIndex = TRACKS.findIndex((t) => t.id === currentTrack.id);
+    const listToUse = filteredTracks.some((t) => t.id === currentTrack.id) ? filteredTracks : TRACKS;
+    const currentIndex = listToUse.findIndex((t) => t.id === currentTrack.id);
     if (currentIndex === -1) return;
-    const nextIndex = (currentIndex + 1) % TRACKS.length;
-    play(TRACKS[nextIndex]);
+    const nextIndex = (currentIndex + 1) % listToUse.length;
+    play(listToUse[nextIndex]);
   };
 
-  // Navigue vers le morceau précédent dans le catalogue (boucle à la fin si au début)
+  // Navigue vers le morceau précédent (boucle à la fin si au début) dans le contexte filtré ou complet
   const handlePrevTrack = () => {
     if (!currentTrack) return;
-    const currentIndex = TRACKS.findIndex((t) => t.id === currentTrack.id);
+    const listToUse = filteredTracks.some((t) => t.id === currentTrack.id) ? filteredTracks : TRACKS;
+    const currentIndex = listToUse.findIndex((t) => t.id === currentTrack.id);
     if (currentIndex === -1) return;
-    const prevIndex = (currentIndex - 1 + TRACKS.length) % TRACKS.length;
-    play(TRACKS[prevIndex]);
+    const prevIndex = (currentIndex - 1 + listToUse.length) % listToUse.length;
+    play(listToUse[prevIndex]);
   };
 
   // Keep ref up to date to avoid stale closure in useAudio onEnded callback
@@ -83,11 +93,13 @@ export function Home() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Titres populaires</h2>
           <p className={styles.sectionSubtitle}>
-            {TRACKS.length} morceaux répartis sur plusieurs genres et artistes.
+            {searchQuery.trim()
+              ? `${filteredTracks.length} morceau(x) trouvé(s)`
+              : `${TRACKS.length} morceaux répartis sur plusieurs genres et artistes.`}
           </p>
 
           <TrackList
-            tracks={TRACKS}
+            tracks={filteredTracks}
             onTrackSelect={handleTrackSelect}
             currentTrackId={currentTrack?.id}
             isPlaying={isPlaying}
