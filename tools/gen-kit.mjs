@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Générateur d'actifs offline pour le kit de démo.
 // - Crée 12 pochettes SVG locales (aucune URL externe) dans les dossiers public/covers.
 // - Écrit public/tracks.json (le fichier "type API" servi à la racine).

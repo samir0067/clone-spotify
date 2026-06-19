@@ -14,6 +14,17 @@
   z-index: 200;
 }
 
+@media (min-width: 769px) {
+  .header {
+    left: var(--sidebar-width, 240px);
+    width: calc(100% - var(--sidebar-width, 240px));
+  }
+  
+  .brand {
+    display: none;
+  }
+}
+
 .brand {
   display: flex;
   align-items: center;

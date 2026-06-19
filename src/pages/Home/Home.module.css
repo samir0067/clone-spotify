@@ -1,11 +1,33 @@
+.appWrapper {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--spotify-dark-base);
+}
+
 .container {
+  flex: 1;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   /* Offset for the fixed Header at the top and the player bar at the bottom */
   padding-top: var(--header-height, 64px);
   padding-bottom: calc(var(--player-height) + var(--space-lg));
+  min-width: 0;
 }
+
+@media (min-width: 769px) {
+  .container {
+    margin-left: var(--sidebar-width, 240px);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin-left: 64px;
+  }
+}
+
 
 .mainContent {
   flex: 1;
@@ -33,5 +55,26 @@
   color: var(--color-text-secondary);
   margin-bottom: var(--space-lg);
 }
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl) 0;
+  font-size: 1.125rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.errorContainer {
+  background-color: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  color: #ff4444;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  margin-bottom: var(--space-lg);
+}
+
 
 

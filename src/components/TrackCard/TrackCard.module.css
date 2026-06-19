@@ -117,6 +117,47 @@
 .duration {
   color: var(--color-text-muted);
   font-size: 0.75rem;
-  margin-top: var(--space-xs);
-  align-self: flex-start;
 }
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-xs);
+  width: 100%;
+}
+
+.likeButton {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs);
+  border-radius: var(--radius-full);
+  transition: color 0.2s ease, transform 0.2s ease;
+  min-inline-size: 28px;
+  min-block-size: 28px;
+}
+
+.likeButton:hover {
+  color: var(--color-text-primary);
+  transform: scale(1.15);
+}
+
+.likeButton.liked {
+  color: var(--spotify-green);
+}
+
+.likeButton:focus-visible {
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 1px;
+}
+
+.heartIcon {
+  width: 18px;
+  height: 18px;
+}
+

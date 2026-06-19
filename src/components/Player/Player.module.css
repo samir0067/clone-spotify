@@ -319,3 +319,40 @@
 .volumeSlider:hover:not(.disabledSlider) .volumeSliderProgress {
   background-color: var(--spotify-green);
 }
+
+.playerLikeButton {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs);
+  border-radius: var(--radius-full);
+  transition: color 0.2s ease, transform 0.2s ease;
+  margin-left: var(--space-xs);
+  flex-shrink: 0;
+  min-inline-size: 32px;
+  min-block-size: 32px;
+}
+
+.playerLikeButton:hover {
+  color: var(--color-text-primary);
+  transform: scale(1.1);
+}
+
+.playerLikeButton.liked {
+  color: var(--spotify-green);
+}
+
+.playerLikeButton:focus-visible {
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 1px;
+}
+
+.playerHeartIcon {
+  width: 18px;
+  height: 18px;
+}
+
