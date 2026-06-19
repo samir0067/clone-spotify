@@ -32,7 +32,6 @@ export function Header({ children, appName = 'Spotify', userName = 'Utilisateur'
       <div className={styles.brand}>
         <img src={logo} alt="" className={styles.logo} />
         <span className={styles.appName}>{appName}</span>
-        <span className={styles.sixSeven}>SIX SEVEN</span>
       </div>
 
       <div className={styles.searchSlot}>{children}</div>
