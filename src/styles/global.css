@@ -89,17 +89,17 @@
 @layer theme {
   :root {
     /* Spotify Design Tokens - Colors */
-    --spotify-green: #1db954;
-    --spotify-green-hover: #1ed760;
-    --spotify-black: #191414;
-    --spotify-dark-base: #121212;
-    --spotify-dark-highlight: #1a1a1a;
-    --spotify-dark-card: #181818;
-    --spotify-dark-card-hover: #282828;
+    --spotify-green: #ff1493;
+    --spotify-green-hover: #c71585;
+    --spotify-black: #ffb6c1;
+    --spotify-dark-base: #fff0f5;
+    --spotify-dark-highlight: #ffe4e1;
+    --spotify-dark-card: #ffffff;
+    --spotify-dark-card-hover: #ffe4e1;
     
-    --color-text-primary: #ffffff;
-    --color-text-secondary: #b3b3b3;
-    --color-text-muted: #a7a7a7;
+    --color-text-primary: #2d3748;
+    --color-text-secondary: #4a5568;
+    --color-text-muted: #718096;
     
     /* Layout Sizes */
     --sidebar-width: 240px;

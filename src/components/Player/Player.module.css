@@ -4,10 +4,10 @@
   left: 0;
   width: 100%;
   height: var(--player-height, 90px);
-  background-color: rgba(24, 24, 24, 0.85);
+  background-color: var(--spotify-black);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -86,7 +86,7 @@
   height: 56px;
   border-radius: var(--radius-sm);
   background-color: var(--spotify-dark-highlight);
-  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border: 1px dashed rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -174,7 +174,7 @@
 
 .playerPlayBtn:disabled {
   opacity: 0.5;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.3);
   cursor: not-allowed;
 }
 
@@ -219,7 +219,7 @@
 .progressBar {
   flex: 1;
   height: 4px;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(0, 0, 0, 0.15);
   border-radius: var(--radius-full);
   position: relative;
   overflow: hidden;
@@ -293,7 +293,7 @@
 .volumeSlider {
   width: 90px;
   height: 4px;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(0, 0, 0, 0.15);
   border-radius: var(--radius-full);
   position: relative;
   cursor: pointer;

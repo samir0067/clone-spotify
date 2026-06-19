@@ -12,6 +12,16 @@ export function Home() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [likedTrackIds, setLikedTrackIds] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState('Tous');
+  const [userName, setUserName] = useState(() => localStorage.getItem('userName') || 'Utilisateur');
+
+  const handleAvatarClick = () => {
+    const newName = window.prompt("Quel est votre nom d'utilisateur ?", userName);
+    if (newName !== null && newName.trim() !== '') {
+      setUserName(newName.trim());
+      localStorage.setItem('userName', newName.trim());
+    }
+  };
 
   const {
     isPlaying,
@@ -79,10 +89,14 @@ export function Home() {
 
   const lowerQuery = searchQuery.toLowerCase();
   const filteredTracks = TRACKS.filter(
-    (track) =>
-      track.title.toLowerCase().includes(lowerQuery) ||
-      track.artist.toLowerCase().includes(lowerQuery)
+    (track) => {
+      const matchesSearch = track.title.toLowerCase().includes(lowerQuery) || track.artist.toLowerCase().includes(lowerQuery);
+      const matchesGenre = selectedGenre === 'Tous' ? true : track.genre === selectedGenre;
+      return matchesSearch && matchesGenre;
+    }
   );
+
+  const availableGenres = ['Tous', ...new Set(TRACKS.map(track => track.genre))];
 
   const likedArtists = [
     ...new Set(
@@ -97,14 +111,47 @@ export function Home() {
       likedArtists.includes(track.artist) && !likedTrackIds.includes(track.id)
   );
 
+  const favoriteTracks = TRACKS.filter((track) => likedTrackIds.includes(track.id));
+
   return (
     <div className={styles.container}>
-      <Header>
+      <Header userName={userName} onAvatarClick={handleAvatarClick}>
         <SearchBar onSearch={handleSearch} />
       </Header>
 
       <main className={styles.mainContent}>
-        {suggestedTracks.length > 0 && searchQuery === '' && (
+        <h1 className={styles.greeting}>Bienvenue, {userName} !</h1>
+        
+        <div className={styles.genreFilters}>
+          {availableGenres.map(genre => (
+            <button 
+              key={genre} 
+              className={`${styles.genreBtn} ${selectedGenre === genre ? styles.activeGenreBtn : ''}`}
+              onClick={() => setSelectedGenre(genre)}
+            >
+              {genre}
+            </button>
+          ))}
+        </div>
+
+        {favoriteTracks.length > 0 && searchQuery === '' && selectedGenre === 'Tous' && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Vos titres aimés</h2>
+            <p className={styles.sectionSubtitle}>
+              Les morceaux que vous avez ajoutés à vos favoris.
+            </p>
+            <TrackList
+              tracks={favoriteTracks}
+              onTrackSelect={handleTrackSelect}
+              currentTrackId={currentTrack?.id}
+              isPlaying={isPlaying}
+              likedTrackIds={likedTrackIds}
+              onLikeToggle={handleLikeToggle}
+            />
+          </section>
+        )}
+
+        {suggestedTracks.length > 0 && searchQuery === '' && selectedGenre === 'Tous' && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Suggestions pour vous</h2>
             <p className={styles.sectionSubtitle}>

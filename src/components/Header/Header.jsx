@@ -18,7 +18,7 @@ import styles from './Header.module.css';
  * @param {string} [props.appName='Spotify'] - Application name shown next to the logo.
  * @param {string} [props.userName='Utilisateur'] - User name used for the avatar label.
  */
-export function Header({ children, appName = 'Spotify', userName = 'Utilisateur' }) {
+export function Header({ children, appName = 'Spotify', userName = 'Utilisateur', onAvatarClick }) {
   // Build initials from the user name for the fallback avatar.
   const initials = userName
     .split(' ')
@@ -41,6 +41,7 @@ export function Header({ children, appName = 'Spotify', userName = 'Utilisateur'
         className={styles.avatar}
         aria-label={`Compte de ${userName}`}
         title={userName}
+        onClick={onAvatarClick}
       >
         <span aria-hidden="true">{initials}</span>
       </button>
