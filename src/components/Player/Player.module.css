@@ -16,7 +16,7 @@
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
 }
 
-/* 1. Left Section: Track Info */
+/* Gauche : infos du morceau */
 .playerTrackInfo {
   display: flex;
   align-items: center;
@@ -42,7 +42,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  min-width: 0; /* allows text truncation */
+  min-width: 0; /* autorise la troncature du texte */
 }
 
 .playerTitle {
@@ -62,18 +62,7 @@
   text-overflow: ellipsis;
 }
 
-/* Error indicator */
-.errorIndicator {
-  font-size: 0.7rem;
-  color: #ff4444;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  margin-top: 2px;
-}
-
-/* Empty State styling */
+/* État vide (aucun morceau sélectionné) */
 .emptyTrackInfo {
   display: flex;
   align-items: center;
@@ -104,7 +93,7 @@
   font-weight: 500;
 }
 
-/* 2. Center Section: Playback Controls & Progress Bar */
+/* Centre : bouton play/pause + barre de progression (décorative) */
 .playerControlsContainer {
   display: flex;
   flex-direction: column;
@@ -114,43 +103,9 @@
   max-width: 600px;
 }
 
-.playerControls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-}
-
-.controlBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: transparent;
-}
-
-.controlBtn:hover:not(:disabled) {
-  color: var(--color-text-primary);
-  transform: scale(1.05);
-}
-
-.controlBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.controlIcon {
-  width: 18px;
-  height: 18px;
-}
-
 .playerPlayBtn {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-full);
   background-color: var(--color-text-primary);
   color: var(--spotify-black);
@@ -165,7 +120,6 @@
 
 .playerPlayBtn:hover:not(:disabled) {
   transform: scale(1.08);
-  background-color: var(--color-text-primary);
 }
 
 .playerPlayBtn:active:not(:disabled) {
@@ -183,24 +137,6 @@
   height: 20px;
 }
 
-/* Buffering spinner rotation styles */
-.spinner {
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-  color: var(--spotify-black);
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Progress Bar styling */
 .progressBarContainer {
   display: flex;
   align-items: center;
@@ -223,101 +159,20 @@
   border-radius: var(--radius-full);
   position: relative;
   overflow: hidden;
-  cursor: pointer;
-  transition: height 0.1s ease;
-  outline: none;
-}
-
-.progressBar:focus-visible {
-  outline: 2px solid var(--color-text-primary);
-  outline-offset: 3px;
-}
-
-.progressBar:hover {
-  height: 6px;
 }
 
 .progressBarFill {
   height: 100%;
-  background-color: var(--color-text-primary);
+  background-color: var(--spotify-green);
   border-radius: var(--radius-full);
   width: 0%;
-  transition: width 0.1s linear; /* Smooth micro-transitions during play */
+  transition: width 0.3s ease;
 }
 
-.progressBar:hover .progressBarFill {
-  background-color: var(--spotify-green);
-}
-
-/* 3. Right Section: Volume & Mute Controls */
-.playerVolume {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
+/* Droite : simple espace pour garder le bloc central centré */
+.playerSpacer {
   width: 30%;
   min-width: 150px;
-  justify-content: flex-end;
-}
-
-.volumeBtn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  border-radius: var(--radius-full);
-  transition: transform 0.2s ease;
-}
-
-.volumeBtn:hover:not(:disabled) {
-  transform: scale(1.1);
-}
-
-.volumeBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.volumeIcon {
-  font-size: 1.1rem;
-  color: var(--color-text-secondary);
-  transition: color 0.2s ease;
-}
-
-.volumeBtn:hover:not(:disabled) .volumeIcon {
-  color: var(--color-text-primary);
-}
-
-.volumeSlider {
-  width: 90px;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-full);
-  position: relative;
-  cursor: pointer;
-  transition: height 0.1s ease;
-}
-
-.volumeSlider:hover:not(.disabledSlider) {
-  height: 6px;
-}
-
-.disabledSlider {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.volumeSliderProgress {
-  height: 100%;
-  background-color: var(--color-text-secondary);
-  border-radius: var(--radius-full);
-  transition: background-color 0.2s ease;
-}
-
-.volumeSlider:hover:not(.disabledSlider) .volumeSliderProgress {
-  background-color: var(--spotify-green);
 }
 
 .favoriteButton {

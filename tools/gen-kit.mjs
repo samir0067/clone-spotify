@@ -72,14 +72,13 @@ function buildCover(track) {
 `;
 }
 
-// Dossiers cibles : le clone principal et le clone monolithique.
-const COVER_DIRS = [join(ROOT, 'public', 'covers'), join(ROOT, 'mono', 'public', 'covers')];
+// Dossier cible : le clone (les deux versions, rangée et monolithique,
+// partagent le même /public/covers).
+const COVERS_DIR = join(ROOT, 'public', 'covers');
 
-for (const dir of COVER_DIRS) {
-  mkdirSync(dir, { recursive: true });
-  for (const track of TRACKS) {
-    writeFileSync(join(dir, `cover-${track.id}.svg`), buildCover(track), 'utf8');
-  }
+mkdirSync(COVERS_DIR, { recursive: true });
+for (const track of TRACKS) {
+  writeFileSync(join(COVERS_DIR, `cover-${track.id}.svg`), buildCover(track), 'utf8');
 }
 
 // Fichier "type API" servi à la racine du clone principal.
@@ -94,6 +93,9 @@ const apiPayload = TRACKS.map((t) => ({
   cover: `/covers/cover-${t.id}.svg`,
 }));
 
-writeFileSync(join(ROOT, 'public', 'tracks.json'), JSON.stringify(apiPayload, null, 2) + '\n', 'utf8');
+const tracksJson = JSON.stringify(apiPayload, null, 2) + '\n';
+writeFileSync(join(ROOT, 'public', 'tracks.json'), tracksJson, 'utf8');
 
-console.log(`OK : ${TRACKS.length} pochettes x ${COVER_DIRS.length} dossiers + public/tracks.json`);
+console.log(
+  `OK : ${TRACKS.length} pochettes dans public/covers + public/tracks.json`
+);

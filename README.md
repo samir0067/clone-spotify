@@ -10,33 +10,44 @@ L'architecture suit les conventions modernes de développement React :
 
 ```text
 clone-spotify/
-├── eslint.config.js       # Configuration ESLint (Flat Config)
-├── index.html             # Point d'entrée HTML5 (SEO & Google Fonts configurés)
+├── index.html             # Point d'entrée HTML5 (100% hors-ligne, aucune police distante)
 ├── package.json           # Dépendances et scripts npm
-├── vite.config.js         # Configuration du serveur de développement et de build Vite
-├── .prettierrc            # Règles de formatage de code
-├── .gitignore             # Fichiers ignorés par Git
+├── vite.config.js         # Configuration Vite (dev/build), port 3000
+├── public/                # Servi à la racine du site (sans réseau)
+│   ├── tracks.json        # Fichier "type API" (PAS encore branché : voir Démo 2)
+│   └── covers/            # 12 pochettes SVG locales (cover-1.svg … cover-12.svg)
+├── tools/
+│   └── gen-kit.mjs        # Génère les pochettes + tracks.json (non importé par l'app)
+├── docs/
+│   ├── GUIDE-ANIMATEUR.md # Mode d'emploi des 4 démos live
+│   ├── reference/CONTEXT.md  # Copie de référence du fichier de conventions (gardée de côté)
+│   └── recaps/            # Récaps de tâches
 └── src/
-    ├── assets/            # Ressources statiques (logos, images, SVG)
-    │   ├── logo.svg       # Logo Spotify en SVG
-    │   └── album-cover.png # Pochette d'album générée pour la démonstration
-    ├── components/        # Composants réutilisables (un dossier par composant)
-    │   └── TrackCard/     # Composant de démonstration
-    │       ├── TrackCard.jsx
-    │       └── TrackCard.module.css
-    ├── hooks/             # Hooks personnalisés
-    │   └── useAudio.js    # Hook pour contrôler la lecture audio (mock)
-    ├── pages/             # Pages ou vues principales de l'application
-    │   └── Home/
-    │       ├── Home.jsx
-    │       └── Home.module.css
-    ├── styles/            # Système de style global et jetons de design (Tokens)
-    │   └── global.css     # Réinitialisation, polices, thèmes et variables CSS Spotify
-    ├── utils/             # Fonctions utilitaires partagées
-    │   └── formatTime.js  # Formatage des durées (secondes -> mm:ss)
-    ├── App.jsx            # Composant racine de l'application
-    └── main.jsx           # Point d'entrée JavaScript React
+    ├── assets/            # logo.svg + album-cover.png (repli de pochette)
+    ├── components/        # 1 composant = 1 dossier (.jsx + .module.css)
+    │   ├── Header/        # Barre du haut
+    │   ├── SearchBar/     # Champ de recherche
+    │   ├── TrackList/     # Liste (grille) des morceaux
+    │   ├── TrackCard/     # Carte d'un morceau
+    │   └── Player/        # Lecteur (barre du bas, play/pause visuel)
+    ├── hooks/
+    │   └── usePlayer.js   # État du lecteur (morceau courant + play/pause)
+    ├── data/
+    │   └── tracks.js      # Données EN DUR (12 morceaux) — état de départ
+    ├── pages/Home/        # Page principale (assemble tout + recherche)
+    ├── styles/global.css  # Reset, thème sombre et Design Tokens Spotify
+    ├── utils/
+    │   └── formatDuration.js  # Durée en secondes -> "m:ss"
+    ├── App.jsx            # Composant racine (version rangée, par défaut)
+    ├── AppMono.jsx        # Version MONOLITHIQUE tout-en-un (Démo 4 - Architecture)
+    └── main.jsx           # Point d'entrée React (bascule App ↔ AppMono)
 ```
+
+> Notes :
+> - `src/hooks/useTracks.js` n'existe pas encore — il est créé **en direct**
+>   pendant la Démo 2 (Brancher une API). Voir `docs/GUIDE-ANIMATEUR.md`.
+> - La version monolithique se charge en commentant une ligne dans `src/main.jsx`
+>   (`./App` → `./AppMono`). Même projet, même install, même port.
 
 ---
 
@@ -44,7 +55,7 @@ clone-spotify/
 
 - **Composants & Pages** : Nommés en `PascalCase` (ex: `TrackCard.jsx`, `Home.jsx`).
   - Chaque composant a son propre dossier contenant son code React (`.jsx`) et sa feuille de style associée (`.module.css`).
-- **Fonctions & Hooks** : Nommés en `camelCase` (ex: `useAudio.js`, `formatTime.js`).
+- **Fonctions & Hooks** : Nommés en `camelCase`, hooks préfixés par `use` (ex: `usePlayer.js`, `formatDuration.js`).
 - **Style CSS** :
   - **Pas de styles inline** (sauf cas de valeurs dynamiques absolues issues du JS).
   - Utilisation systématique des **CSS Modules** pour éviter les conflits de classes.

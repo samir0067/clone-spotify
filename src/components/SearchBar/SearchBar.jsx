@@ -33,6 +33,7 @@ export function SearchBar({ onSearch, placeholder = 'Que souhaitez-vous écouter
       </svg>
       <input
         type="search"
+        name="search"
         className={styles.input}
         value={query}
         onChange={handleChange}
