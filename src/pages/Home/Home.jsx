@@ -7,8 +7,7 @@ import { Player } from '../../components/Player/Player';
 import { Sidebar } from '../../components/Sidebar/Sidebar';
 import { LyricsPanel } from '../../components/LyricsPanel/LyricsPanel';
 import { PlaylistView } from '../../components/PlaylistView/PlaylistView';
-import { useFetchTracks } from '../../hooks/useFetchTracks';
-import { generateMockLyrics } from '../../data/tracks';
+import { TRACKS, generateMockLyrics } from '../../data/tracks';
 import styles from './Home.module.css';
 
 const GENRES = ['Tous', 'Pop', 'Rap', 'Rock', 'Électro', 'Jazz'];
@@ -25,9 +24,6 @@ export function Home() {
   // API Fetch states for iTunes search
   const [apiTracks, setApiTracks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Custom hook to fetch local starting tracks (/tracks.json)
-  const { tracks: localTracks, isLoading: isLocalLoading, error: localError } = useFetchTracks();
 
   // Playback Queue
   const [playbackQueue, setPlaybackQueue] = useState([]);
@@ -53,12 +49,12 @@ export function Home() {
     localStorage.setItem('spotify-clone-playlists', JSON.stringify(playlists));
   }, [playlists]);
 
-  // Sync playbackQueue when localTracks loads
+  // Sync playbackQueue when default TRACKS load at startup
   useEffect(() => {
-    if (localTracks.length > 0 && playbackQueue.length === 0) {
-      setPlaybackQueue(localTracks);
+    if (TRACKS.length > 0 && playbackQueue.length === 0) {
+      setPlaybackQueue(TRACKS);
     }
-  }, [localTracks, playbackQueue]);
+  }, [playbackQueue]);
 
   // --- API Fetch Function ---
   const fetchTracks = useCallback(async (query) => {
@@ -93,17 +89,17 @@ export function Home() {
       setApiTracks(formatted);
     } catch (error) {
       console.warn('Erreur iTunes API (offline fallback) :', error);
-      // Fallback to local loaded tracks
-      setApiTracks(localTracks);
+      // Fallback to local mock tracks
+      setApiTracks(TRACKS);
     } finally {
       setIsLoading(false);
     }
-  }, [localTracks]);
+  }, []);
 
   // --- Debounced Search Query Effect ---
   useEffect(() => {
     if (searchQuery.trim() === '') {
-      setApiTracks(localTracks);
+      setApiTracks([]);
     } else {
       const delayDebounceFn = setTimeout(() => {
         fetchTracks(searchQuery);
@@ -111,7 +107,7 @@ export function Home() {
 
       return () => clearTimeout(delayDebounceFn);
     }
-  }, [searchQuery, localTracks, fetchTracks]);
+  }, [searchQuery, fetchTracks]);
 
   // --- Audio Hook ---
   const {
@@ -139,12 +135,12 @@ export function Home() {
   // --- Computed Memos ---
   const likedTracks = useMemo(() => {
     // Liked tracks could be from local JSON or dynamic search API.
-    const allKnownTracks = [...localTracks, ...apiTracks];
+    const allKnownTracks = [...TRACKS, ...apiTracks];
     const uniqueKnownTracksMap = new Map(allKnownTracks.map((t) => [t.id, t]));
     return likedTrackIds
       .map((id) => uniqueKnownTracksMap.get(id))
       .filter((track) => !!track);
-  }, [likedTrackIds, localTracks, apiTracks]);
+  }, [likedTrackIds, apiTracks]);
 
   const activePlaylist = useMemo(() => {
     if (activeView.startsWith('playlist-')) {
@@ -154,7 +150,7 @@ export function Home() {
     return null;
   }, [activeView, playlists]);
 
-  // Filter dynamic iTunes results or local tracks by genre
+  // Filter dynamic iTunes results by genre
   const filteredTracks = useMemo(() => {
     return apiTracks.filter((track) => {
       if (activeGenre !== 'Tous') {
@@ -271,9 +267,6 @@ export function Home() {
     nextTrackRef.current = handleNextTrack;
   });
 
-  const isCurrentlyLoading = isLoading || (searchQuery.trim() === '' && isLocalLoading);
-  const activeError = searchQuery.trim() === '' ? localError : null;
-
   return (
     <div className={styles.container}>
       {/* 1. Sidebar */}
@@ -321,20 +314,16 @@ export function Home() {
                 ))}
               </div>
 
-              {/* Loader Spinner or Error or Tracks List */}
-              {isCurrentlyLoading ? (
+              {/* Loader Spinner or Tracks List */}
+              {isLoading ? (
                 <div className={styles.loaderContainer}>
                   <div className={styles.spotifyLoader} />
-                  <p className={styles.loaderText}>Chargement en cours...</p>
-                </div>
-              ) : activeError ? (
-                <div className={styles.errorContainer}>
-                  <p className={styles.errorText}>⚠️ Une erreur est survenue : {activeError}</p>
+                  <p className={styles.loaderText}>Recherche musicale en cours...</p>
                 </div>
               ) : (
                 <TrackList
-                  tracks={filteredTracks}
-                  onTrackSelect={(track) => handleTrackSelect(track, filteredTracks)}
+                  tracks={searchQuery ? filteredTracks : null}
+                  onTrackSelect={handleTrackSelect}
                   currentTrackId={currentTrack?.id}
                   isPlaying={isPlaying}
                   likedTrackIds={likedTrackIds}
@@ -409,5 +398,6 @@ export function Home() {
     </div>
   );
 }
+
 
 
