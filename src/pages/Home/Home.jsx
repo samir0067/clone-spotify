@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAudio } from '../../hooks/useAudio';
 import { Header } from '../../components/Header/Header';
 import { SearchBar } from '../../components/SearchBar/SearchBar';
@@ -9,6 +9,9 @@ import styles from './Home.module.css';
 
 export function Home() {
   const nextTrackRef = React.useRef(null);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [likedTrackIds, setLikedTrackIds] = useState([]);
 
   const {
     isPlaying,
@@ -32,17 +35,11 @@ export function Home() {
     },
   });
 
-  // Le filtrage sera branché plus tard ; pour l'instant on remonte la saisie.
   const handleSearch = (value) => {
-    // eslint-disable-next-line no-console -- log temporaire de démonstration
-    console.log('Recherche :', value);
+    setSearchQuery(value);
   };
 
-  // Clic sur une carte : on remonte le morceau sélectionné (affiché en console)
-  // et on déclenche la lecture via le hook audio existant.
   const handleTrackSelect = (track) => {
-    // eslint-disable-next-line no-console -- log temporaire de démonstration
-    console.log('Morceau sélectionné :', track);
     if (currentTrack && currentTrack.id === track.id) {
       toggle();
     } else {
@@ -50,7 +47,16 @@ export function Home() {
     }
   };
 
-  // Navigue vers le morceau suivant dans le catalogue (boucle au début si à la fin)
+  const handleLikeToggle = (track) => {
+    setLikedTrackIds((prev) => {
+      if (prev.includes(track.id)) {
+        return prev.filter((id) => id !== track.id);
+      } else {
+        return [...prev, track.id];
+      }
+    });
+  };
+
   const handleNextTrack = () => {
     if (!currentTrack) return;
     const currentIndex = TRACKS.findIndex((t) => t.id === currentTrack.id);
@@ -59,7 +65,6 @@ export function Home() {
     play(TRACKS[nextIndex]);
   };
 
-  // Navigue vers le morceau précédent dans le catalogue (boucle à la fin si au début)
   const handlePrevTrack = () => {
     if (!currentTrack) return;
     const currentIndex = TRACKS.findIndex((t) => t.id === currentTrack.id);
@@ -68,10 +73,29 @@ export function Home() {
     play(TRACKS[prevIndex]);
   };
 
-  // Keep ref up to date to avoid stale closure in useAudio onEnded callback
   React.useEffect(() => {
     nextTrackRef.current = handleNextTrack;
   });
+
+  const lowerQuery = searchQuery.toLowerCase();
+  const filteredTracks = TRACKS.filter(
+    (track) =>
+      track.title.toLowerCase().includes(lowerQuery) ||
+      track.artist.toLowerCase().includes(lowerQuery)
+  );
+
+  const likedArtists = [
+    ...new Set(
+      TRACKS.filter((track) => likedTrackIds.includes(track.id)).map(
+        (track) => track.artist
+      )
+    ),
+  ];
+
+  const suggestedTracks = TRACKS.filter(
+    (track) =>
+      likedArtists.includes(track.artist) && !likedTrackIds.includes(track.id)
+  );
 
   return (
     <div className={styles.container}>
@@ -80,17 +104,40 @@ export function Home() {
       </Header>
 
       <main className={styles.mainContent}>
+        {suggestedTracks.length > 0 && searchQuery === '' && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Suggestions pour vous</h2>
+            <p className={styles.sectionSubtitle}>
+              Basé sur les artistes que vous aimez.
+            </p>
+            <TrackList
+              tracks={suggestedTracks}
+              onTrackSelect={handleTrackSelect}
+              currentTrackId={currentTrack?.id}
+              isPlaying={isPlaying}
+              likedTrackIds={likedTrackIds}
+              onLikeToggle={handleLikeToggle}
+            />
+          </section>
+        )}
+
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Titres populaires</h2>
+          <h2 className={styles.sectionTitle}>
+            {searchQuery ? 'Résultats de recherche' : 'Titres populaires'}
+          </h2>
           <p className={styles.sectionSubtitle}>
-            {TRACKS.length} morceaux répartis sur plusieurs genres et artistes.
+            {searchQuery
+              ? `${filteredTracks.length} résultats pour "${searchQuery}"`
+              : `${TRACKS.length} morceaux répartis sur plusieurs genres et artistes.`}
           </p>
 
           <TrackList
-            tracks={TRACKS}
+            tracks={filteredTracks}
             onTrackSelect={handleTrackSelect}
             currentTrackId={currentTrack?.id}
             isPlaying={isPlaying}
+            likedTrackIds={likedTrackIds}
+            onLikeToggle={handleLikeToggle}
           />
         </section>
       </main>
