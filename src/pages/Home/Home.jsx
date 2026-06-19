@@ -4,11 +4,25 @@ import { Header } from '../../components/Header/Header';
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { TrackList } from '../../components/TrackList/TrackList';
 import { Player } from '../../components/Player/Player';
+import { GenreFilter } from '../../components/GenreFilter/GenreFilter';
 import { TRACKS } from '../../data/tracks';
 import styles from './Home.module.css';
 
 export function Home() {
   const nextTrackRef = React.useRef(null);
+  const [selectedGenre, setSelectedGenre] = React.useState(null);
+
+  // Extract unique genres from tracks
+  const uniqueGenres = React.useMemo(() => {
+    const genres = new Set(TRACKS.map((track) => track.genre));
+    return Array.from(genres).sort();
+  }, []);
+
+  // Filter tracks based on selected genre
+  const filteredTracks = React.useMemo(() => {
+    if (!selectedGenre) return TRACKS;
+    return TRACKS.filter((track) => track.genre === selectedGenre);
+  }, [selectedGenre]);
 
   const {
     isPlaying,
@@ -83,11 +97,18 @@ export function Home() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Titres populaires</h2>
           <p className={styles.sectionSubtitle}>
-            {TRACKS.length} morceaux répartis sur plusieurs genres et artistes.
+            {filteredTracks.length} morceaux
+            {selectedGenre && ` dans le genre ${selectedGenre}`}
           </p>
 
+          <GenreFilter
+            genres={uniqueGenres}
+            selectedGenre={selectedGenre}
+            onGenreSelect={setSelectedGenre}
+          />
+
           <TrackList
-            tracks={TRACKS}
+            tracks={filteredTracks}
             onTrackSelect={handleTrackSelect}
             currentTrackId={currentTrack?.id}
             isPlaying={isPlaying}
