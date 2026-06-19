@@ -1,10 +1,12 @@
 import React from 'react';
 import { useAudio } from '../../hooks/useAudio';
+import { useFetchTracks } from '../../hooks/useFetchTracks';
 import { Header } from '../../components/Header/Header';
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { TrackList } from '../../components/TrackList/TrackList';
 import { Player } from '../../components/Player/Player';
 import { GenreFilter } from '../../components/GenreFilter/GenreFilter';
+import { FetchedTracksList } from '../../components/FetchedTracksList/FetchedTracksList';
 import { TRACKS } from '../../data/tracks';
 import styles from './Home.module.css';
 
@@ -113,6 +115,14 @@ export function Home() {
             currentTrackId={currentTrack?.id}
             isPlaying={isPlaying}
           />
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Morceaux depuis API</h2>
+          <p className={styles.sectionSubtitle}>
+            Exemple d'utilisation du hook useFetchTracks qui charge les données depuis /tracks.json
+          </p>
+          <FetchedTracksList />
         </section>
       </main>
 
