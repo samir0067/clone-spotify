@@ -4,11 +4,12 @@ import { Header } from '../../components/Header/Header';
 import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { TrackList } from '../../components/TrackList/TrackList';
 import { Player } from '../../components/Player/Player';
-import { TRACKS } from '../../data/tracks';
+import { useTracks } from '../../hooks/useTracks';
 import styles from './Home.module.css';
 
 export function Home() {
   const nextTrackRef = React.useRef(null);
+  const { tracks, loading, error, refetch } = useTracks();
 
   const {
     isPlaying,
@@ -52,20 +53,20 @@ export function Home() {
 
   // Navigue vers le morceau suivant dans le catalogue (boucle au début si à la fin)
   const handleNextTrack = () => {
-    if (!currentTrack) return;
-    const currentIndex = TRACKS.findIndex((t) => t.id === currentTrack.id);
+    if (!currentTrack || tracks.length === 0) return;
+    const currentIndex = tracks.findIndex((t) => t.id === currentTrack.id);
     if (currentIndex === -1) return;
-    const nextIndex = (currentIndex + 1) % TRACKS.length;
-    play(TRACKS[nextIndex]);
+    const nextIndex = (currentIndex + 1) % tracks.length;
+    play(tracks[nextIndex]);
   };
 
   // Navigue vers le morceau précédent dans le catalogue (boucle à la fin si au début)
   const handlePrevTrack = () => {
-    if (!currentTrack) return;
-    const currentIndex = TRACKS.findIndex((t) => t.id === currentTrack.id);
+    if (!currentTrack || tracks.length === 0) return;
+    const currentIndex = tracks.findIndex((t) => t.id === currentTrack.id);
     if (currentIndex === -1) return;
-    const prevIndex = (currentIndex - 1 + TRACKS.length) % TRACKS.length;
-    play(TRACKS[prevIndex]);
+    const prevIndex = (currentIndex - 1 + tracks.length) % tracks.length;
+    play(tracks[prevIndex]);
   };
 
   // Keep ref up to date to avoid stale closure in useAudio onEnded callback
@@ -82,16 +83,42 @@ export function Home() {
       <main className={styles.mainContent}>
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Titres populaires</h2>
-          <p className={styles.sectionSubtitle}>
-            {TRACKS.length} morceaux répartis sur plusieurs genres et artistes.
-          </p>
+          
+          {loading && (
+            <div className={styles.skeletonGrid} aria-label="Chargement des morceaux en cours">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className={styles.skeletonCard}>
+                  <div className={styles.skeletonCover} />
+                  <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
+                  <div className={`${styles.skeletonLine} ${styles.skeletonArtist}`} />
+                </div>
+              ))}
+            </div>
+          )}
 
-          <TrackList
-            tracks={TRACKS}
-            onTrackSelect={handleTrackSelect}
-            currentTrackId={currentTrack?.id}
-            isPlaying={isPlaying}
-          />
+          {error && (
+            <div className={styles.errorContainer}>
+              <h3 className={styles.errorTitle}>Impossible de charger les morceaux</h3>
+              <p className={styles.errorMessage}>{error}</p>
+              <button className={styles.retryButton} onClick={refetch}>
+                Réessayer
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <>
+              <p className={styles.sectionSubtitle}>
+                {tracks.length} morceaux répartis sur plusieurs genres et artistes.
+              </p>
+              <TrackList
+                tracks={tracks}
+                onTrackSelect={handleTrackSelect}
+                currentTrackId={currentTrack?.id}
+                isPlaying={isPlaying}
+              />
+            </>
+          )}
         </section>
       </main>
 
