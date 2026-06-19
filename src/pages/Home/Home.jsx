@@ -5,8 +5,20 @@ import { SearchBar } from '../../components/SearchBar/SearchBar';
 import { TrackList } from '../../components/TrackList/TrackList';
 import { Player } from '../../components/Player/Player';
 import { Profile } from '../../components/Profile/Profile';
-import { TRACKS } from '../../data/tracks';
 import styles from './Home.module.css';
+
+const AUDIO_URLS = [
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5-broken.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3',
+];
 
 export function Home() {
   const nextTrackRef = React.useRef(null);
@@ -33,8 +45,26 @@ export function Home() {
     },
   });
 
+  const [tracks, setTracks] = React.useState([]);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [activeTab, setActiveTab] = React.useState('home');
+
+  React.useEffect(() => {
+    fetch('/tracks.json')
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((track, index) => ({
+          ...track,
+          coverUrl: track.cover,
+          audioUrl: AUDIO_URLS[index % AUDIO_URLS.length],
+          year: 2020 + (index % 5), // Provide a dynamic mock year for search compatibility
+        }));
+        setTracks(formatted);
+      })
+      .catch((err) => {
+        console.error('Error loading tracks from JSON:', err);
+      });
+  }, []);
 
   // Favorites state persisted in localStorage
   const [favorites, setFavorites] = React.useState(() => {
@@ -73,29 +103,29 @@ export function Home() {
   }, []);
 
   const filteredTracks = React.useMemo(() => {
-    if (!searchQuery.trim()) return TRACKS;
+    if (!searchQuery.trim()) return tracks;
     
     // Split the query into individual terms (e.g. "mira daylight" -> ["mira", "daylight"])
     const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
-    if (terms.length === 0) return TRACKS;
+    if (terms.length === 0) return tracks;
 
-    return TRACKS.filter((track) => {
+    return tracks.filter((track) => {
       // Every typed term must match at least one attribute of the track (title, artist, album, genre, or year)
       return terms.every((term) => {
         const titleMatch = track.title.toLowerCase().includes(term);
         const artistMatch = track.artist.toLowerCase().includes(term);
         const albumMatch = track.album.toLowerCase().includes(term);
         const genreMatch = track.genre.toLowerCase().includes(term);
-        const yearMatch = track.year.toString().includes(term);
+        const yearMatch = track.year ? track.year.toString().includes(term) : false;
         
         return titleMatch || artistMatch || albumMatch || genreMatch || yearMatch;
       });
     });
-  }, [searchQuery]);
+  }, [searchQuery, tracks]);
 
   const favoriteTracks = React.useMemo(() => {
-    return TRACKS.filter((track) => favorites.includes(track.id));
-  }, [favorites]);
+    return tracks.filter((track) => favorites.includes(track.id));
+  }, [favorites, tracks]);
 
   // Determine current active track list for next/prev playback queue navigation
   const activeTrackList = React.useMemo(() => {
@@ -124,7 +154,7 @@ export function Home() {
   // Navigue vers le morceau suivant dans le catalogue (boucle au début si à la fin)
   const handleNextTrack = () => {
     if (!currentTrack) return;
-    const list = activeTrackList.length > 0 ? activeTrackList : TRACKS;
+    const list = activeTrackList.length > 0 ? activeTrackList : tracks;
     const currentIndex = list.findIndex((t) => t.id === currentTrack.id);
     if (currentIndex === -1) return;
     const nextIndex = (currentIndex + 1) % list.length;
@@ -134,7 +164,7 @@ export function Home() {
   // Navigue vers le morceau précédent dans le catalogue (boucle à la fin si au début)
   const handlePrevTrack = () => {
     if (!currentTrack) return;
-    const list = activeTrackList.length > 0 ? activeTrackList : TRACKS;
+    const list = activeTrackList.length > 0 ? activeTrackList : tracks;
     const currentIndex = list.findIndex((t) => t.id === currentTrack.id);
     if (currentIndex === -1) return;
     const prevIndex = (currentIndex - 1 + list.length) % list.length;
@@ -164,7 +194,7 @@ export function Home() {
             <p className={styles.sectionSubtitle}>
               {searchQuery.trim()
                 ? `${filteredTracks.length} morceau${filteredTracks.length > 1 ? 's' : ''} trouvé${filteredTracks.length > 1 ? 's' : ''} pour "${searchQuery}"`
-                : `${TRACKS.length} morceaux répartis sur plusieurs genres et artistes.`}
+                : `${tracks.length} morceaux répartis sur plusieurs genres et artistes.`}
             </p>
 
             <TrackList
