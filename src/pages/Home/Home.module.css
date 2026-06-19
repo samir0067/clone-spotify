@@ -117,3 +117,20 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Error message styling */
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl) 0;
+  text-align: center;
+  width: 100%;
+}
+
+.errorText {
+  color: #ff4444;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+

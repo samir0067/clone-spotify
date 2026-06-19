@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useAudio } from '../../hooks/useAudio';
 import { Header } from '../../components/Header/Header';
 import { SearchBar } from '../../components/SearchBar/SearchBar';
@@ -7,7 +7,8 @@ import { Player } from '../../components/Player/Player';
 import { Sidebar } from '../../components/Sidebar/Sidebar';
 import { LyricsPanel } from '../../components/LyricsPanel/LyricsPanel';
 import { PlaylistView } from '../../components/PlaylistView/PlaylistView';
-import { TRACKS, generateMockLyrics } from '../../data/tracks';
+import { useFetchTracks } from '../../hooks/useFetchTracks';
+import { generateMockLyrics } from '../../data/tracks';
 import styles from './Home.module.css';
 
 const GENRES = ['Tous', 'Pop', 'Rap', 'Rock', 'Électro', 'Jazz'];
@@ -21,12 +22,15 @@ export function Home() {
   const [activeGenre, setActiveGenre] = useState('Tous');
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
 
-  // API Fetch states
+  // API Fetch states for iTunes search
   const [apiTracks, setApiTracks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Custom hook to fetch local starting tracks (/tracks.json)
+  const { tracks: localTracks, isLoading: isLocalLoading, error: localError } = useFetchTracks();
+
   // Playback Queue
-  const [playbackQueue, setPlaybackQueue] = useState(TRACKS);
+  const [playbackQueue, setPlaybackQueue] = useState([]);
 
   // Liked Track IDs (Persistent in LocalStorage)
   const [likedTrackIds, setLikedTrackIds] = useState(() => {
@@ -49,13 +53,19 @@ export function Home() {
     localStorage.setItem('spotify-clone-playlists', JSON.stringify(playlists));
   }, [playlists]);
 
+  // Sync playbackQueue when localTracks loads
+  useEffect(() => {
+    if (localTracks.length > 0 && playbackQueue.length === 0) {
+      setPlaybackQueue(localTracks);
+    }
+  }, [localTracks, playbackQueue]);
+
   // --- API Fetch Function ---
-  const fetchTracks = async (query) => {
+  const fetchTracks = useCallback(async (query) => {
     setIsLoading(true);
     try {
-      const searchTerm = query.trim() === '' ? 'top hits' : query;
       const response = await fetch(
-        `https://itunes.apple.com/search?term=${encodeURIComponent(searchTerm)}&entity=song&limit=30`
+        `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=30`
       );
       if (!response.ok) {
         throw new Error('La requête réseau iTunes a échoué');
@@ -83,21 +93,25 @@ export function Home() {
       setApiTracks(formatted);
     } catch (error) {
       console.warn('Erreur iTunes API (offline fallback) :', error);
-      // Fallback to local mock tracks
-      setApiTracks(TRACKS);
+      // Fallback to local loaded tracks
+      setApiTracks(localTracks);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [localTracks]);
 
   // --- Debounced Search Query Effect ---
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      fetchTracks(searchQuery);
-    }, 450); // 450ms debounce delay to avoid over-fetching
+    if (searchQuery.trim() === '') {
+      setApiTracks(localTracks);
+    } else {
+      const delayDebounceFn = setTimeout(() => {
+        fetchTracks(searchQuery);
+      }, 450); // 450ms debounce delay to avoid over-fetching
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+      return () => clearTimeout(delayDebounceFn);
+    }
+  }, [searchQuery, localTracks, fetchTracks]);
 
   // --- Audio Hook ---
   const {
@@ -124,14 +138,13 @@ export function Home() {
 
   // --- Computed Memos ---
   const likedTracks = useMemo(() => {
-    // Liked tracks could be from iTunes or local fallback. 
-    // We match likedTrackIds against both local TRACKS and dynamic apiTracks.
-    const allKnownTracks = [...TRACKS, ...apiTracks];
+    // Liked tracks could be from local JSON or dynamic search API.
+    const allKnownTracks = [...localTracks, ...apiTracks];
     const uniqueKnownTracksMap = new Map(allKnownTracks.map((t) => [t.id, t]));
     return likedTrackIds
       .map((id) => uniqueKnownTracksMap.get(id))
       .filter((track) => !!track);
-  }, [likedTrackIds, apiTracks]);
+  }, [likedTrackIds, localTracks, apiTracks]);
 
   const activePlaylist = useMemo(() => {
     if (activeView.startsWith('playlist-')) {
@@ -141,13 +154,11 @@ export function Home() {
     return null;
   }, [activeView, playlists]);
 
-  // Filter dynamic iTunes results by genre
+  // Filter dynamic iTunes results or local tracks by genre
   const filteredTracks = useMemo(() => {
     return apiTracks.filter((track) => {
       if (activeGenre !== 'Tous') {
         const queryGenre = activeGenre.toLowerCase();
-        // Since iTunes returns diverse English genre names, we check partial match
-        // Or if searching in French genres, check mapping. Below handles partial match.
         const trackGenre = (track.genre || '').toLowerCase();
         if (queryGenre === 'électro' && (trackGenre.includes('electro') || trackGenre.includes('dance') || trackGenre.includes('house'))) return true;
         if (queryGenre === 'rap' && (trackGenre.includes('rap') || trackGenre.includes('hip hop') || trackGenre.includes('hip-hop'))) return true;
@@ -260,6 +271,9 @@ export function Home() {
     nextTrackRef.current = handleNextTrack;
   });
 
+  const isCurrentlyLoading = isLoading || (searchQuery.trim() === '' && isLocalLoading);
+  const activeError = searchQuery.trim() === '' ? localError : null;
+
   return (
     <div className={styles.container}>
       {/* 1. Sidebar */}
@@ -307,11 +321,15 @@ export function Home() {
                 ))}
               </div>
 
-              {/* Loader Spinner or Tracks List */}
-              {isLoading ? (
+              {/* Loader Spinner or Error or Tracks List */}
+              {isCurrentlyLoading ? (
                 <div className={styles.loaderContainer}>
                   <div className={styles.spotifyLoader} />
-                  <p className={styles.loaderText}>Recherche musicale en cours...</p>
+                  <p className={styles.loaderText}>Chargement en cours...</p>
+                </div>
+              ) : activeError ? (
+                <div className={styles.errorContainer}>
+                  <p className={styles.errorText}>⚠️ Une erreur est survenue : {activeError}</p>
                 </div>
               ) : (
                 <TrackList
